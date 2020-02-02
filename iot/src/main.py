@@ -1,6 +1,6 @@
-import cloud
-from cloud import Cloud
-from cloud import node
+import network
+from network import Network
+from network import node
 from node import Node
 from node import nodeStatus
 from node import nodeMode
@@ -23,7 +23,7 @@ device2 = Node('Cell_phone_1', 98, 4, 13.30, nodeStatus.REPAIRED, nodeMode.PASSI
 # Initialize BAN with previously-constructed IoT devices
 ban = [device1, device2]
 
-# Construct cloud
-network = Cloud(ban, True)
+# Construct network
+network = Network(ban, True)
 
 displayNetwork(network)

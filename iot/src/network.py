@@ -1,6 +1,6 @@
 import node
 
-class Cloud:
+class Network:
     # Constructor
     def __init__(self, ban, connection):
         self.ban = ban
