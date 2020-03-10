@@ -12,14 +12,15 @@ def displayNetwork(network):
         
         print('Power:', i.getPower())
         print('Energy consumption rate:', i.getEnergyConsumption())
+        print('Queue size:', i.getQueueSize())
         print('Bandwidth:', i.getBandwidth())
         print('Data sensitivity:', i.getDataSensitivity())
         print('Node health:', i.getStatus())
         print('Node security:', i.getMode())
         print()
         
-# Construct IoT devices (name, power, consumption rate, bandwidth, hasIdentifiables, hasPasswords,
-# hasBiometrics, hasTelemetry, hasMiscellaneous, security status, security mode)
+# Construct IoT devices (name, power, consumption rate, bandwidth, hasIdentifiables,
+# hasPasswords,hasBiometrics, hasTelemetry, hasMiscellaneous, security status, security mode)
 device1 = Node('Laptop_1', 100, 2, 20.45, True, True, False, True, True, nodeStatus.VULNERABLE, nodeMode.PASSIVE)
 device2 = Node('Cell_phone_1', 98, 4, 13.30, False, True, False, True, False, nodeStatus.REPAIRED, nodeMode.PASSIVE)
 

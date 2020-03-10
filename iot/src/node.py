@@ -18,6 +18,7 @@ class Node:
         self.name = name
         self.power = power
         self.energyConsumption = energyConsumption
+        self.queueSize = 0
         self.bandwidth = bandwidth
         
         # Define data sensitivity according to the types of data stored. This allows for the implementation of
@@ -45,6 +46,8 @@ class Node:
         self.power = power
     def setEnergyConsumption(self, energyConsumption):
         self.energyConsumption = energyConsumption
+    def setQueueSize(self, queueSize):
+        self.queueSize = queueSize
     def setBandwidth(self, bandwidth):
         self.bandwidth = bandwidth
     def setDataSensitivity(self, hasIdentifiables, hasPasswords, hasBiometrics, hasTelemetry, hasMiscellaneous):
@@ -74,6 +77,8 @@ class Node:
         return self.power
     def getEnergyConsumption(self):
         return self.energyConsumption
+    def getQueueSize(self):
+        return self.queueSize
     def getBandwidth(self):
         return self.bandwidth
     def getDataSensitivity(self):
