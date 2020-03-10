@@ -1,18 +1,5 @@
 from enum import Enum
 
-# Defines type of device in IoT network. Different types of devices can be assumed to contain
-# varying levels of sensitive data, which allows for the assigning of different security "weights"
-# depending on the device's classification. A less-sensitive device can more aggressively conserve
-# battery by neglecting to authenticate network traffic.
-class nodeCategory(Enum):
-    DESKTOP = 0
-    LAPTOP = 1
-    SMARTPHONE = 2
-    SMARTWATCH= 3
-    HOME_ASSISTANT = 4
-    HOME_UTILITY = 5
-    KITCHEN_APPLIANCE = 6
-
 # Defines health of node
 class nodeStatus(Enum):
     COMPROMISED = 0
@@ -26,26 +13,55 @@ class nodeMode(Enum):
 
 class Node:
     # Constructor
-    def __init__(self, name, category, power, energyConsumption, bandwidth, status, mode):
+    def __init__(self, name, power, energyConsumption, bandwidth, hasIdentifiables, 
+                 hasPasswords, hasBiometrics, hasTelemetry, hasMiscellaneous, status, mode):
         self.name = name
-        self.category= category
         self.power = power
         self.energyConsumption = energyConsumption
         self.bandwidth = bandwidth
+        
+        # Define data sensitivity according to the types of data stored. This allows for the implementation of
+        # a weighted security policy, with data-critical devices maintaining relatively aggressive security activity,
+        # and less data-sensitive devices prioritizing energy conservation.
+        self.dataSensitivity = 0
+        if (hasIdentifiables == True):
+            self.dataSensitivity += 5
+        if (hasPasswords == True):
+            self.dataSensitivity += 4
+        if (hasBiometrics == True):
+            self.dataSensitivity += 3
+        if (hasTelemetry == True):
+            self.dataSensitivity += 2
+        if (hasMiscellaneous == True):
+            self.dataSensitivity += 1
+            
         self.status = status
         self.mode = mode
     
     # Methods
     def setName(self, name):
         self.name = name
-    def setType(self, category):
-        self.category = category
     def setPower(self, power):
         self.power = power
     def setEnergyConsumption(self, energyConsumption):
         self.energyConsumption = energyConsumption
     def setBandwidth(self, bandwidth):
         self.bandwidth = bandwidth
+    def setDataSensitivity(self, hasIdentifiables, hasPasswords, hasBiometrics, hasTelemetry, hasMiscellaneous):
+        sensitivity = 0
+        
+        if (hasIdentifiables == True):
+            sensitivity += 5
+        if (hasPasswords == True):
+            sensitivity += 4
+        if (hasBiometrics == True):
+            sensitivity += 3
+        if (hasTelemetry == True):
+            sensitivity += 2
+        if (hasMiscellaneous == True):
+            sensitivity += 1
+            
+        self.dataSensitivity = sensitivity
     def setStatus(self, status):
         self.status = status
     def setMode(self, mode):
@@ -54,14 +70,14 @@ class Node:
     # Accessors
     def getName(self):
         return self.name
-    def getCategory(self):
-        return self.category
     def getPower(self):
         return self.power
     def getEnergyConsumption(self):
         return self.energyConsumption
     def getBandwidth(self):
         return self.bandwidth
+    def getDataSensitivity(self):
+        return self.dataSensitivity
     def getStatus(self):
         return self.status
     def getMode(self):
