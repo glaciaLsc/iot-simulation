@@ -13,11 +13,14 @@ def displayNetwork(network):
         
         print('Power:', i.getPower())
         print('Energy consumption rate:', i.getEnergyConsumption())
-        print('Node security:', i.getMode())
+        print('Data sensitivity:', i.getDataSensitivity())
+        print('Node security policy:', i.getMode())
+        print()
         
-# Construct IoT devices (name, power, consumption rate, bandwidth, security status, security mode)
-device1 = Node('Laptop_1', 100, 2, 20.45, nodeMode.PASSIVE)
-device2 = Node('Cell_phone_1', 98, 4, 13.30, nodeMode.PASSIVE)
+# Construct IoT devices (name, power, consumption rate, hasIdentifiables,
+# hasPasswords,hasBiometrics, hasTelemetry, hasMiscellaneous, security mode)
+device1 = Node('Laptop_1', 100, 2, True, True, False, True, True, nodeMode.PASSIVE)
+device2 = Node('Cell_phone_1', 98, 4, False, True, False, True, False, nodeMode.PASSIVE)
 
 # Initialize BAN with previously-constructed IoT devices
 ban = [device1, device2]
