@@ -1,9 +1,11 @@
 from enum import Enum
+import entity
 
-class nodeStatus(Enum):
-    COMPROMISED = 0
-    VULNERABLE = 1
-    REPAIRED = 2
+class nodeCounterpartEvaluation(Enum):
+    BENENEVOLENT = 0
+    SELFISH = 1
+    MALICIOUS = 2
+    UNKNOWN = 3
     
 class nodeMode(Enum):
     PASSIVE = 0
@@ -11,12 +13,10 @@ class nodeMode(Enum):
 
 class Node:
     # Constructor
-    def __init__(self, name, power, energyConsumption, bandwidth, status, mode):
+    def __init__(self, name, power, energyConsumption, mode):
         self.name = name
         self.power = power
         self.energyConsumption = energyConsumption
-        self.bandwidth = bandwidth
-        self.status = status
         self.mode = mode
     
     # Methods
@@ -26,12 +26,10 @@ class Node:
         self.power = power
     def setEnergyConsumption(self, energyConsumption):
         self.energyConsumption = energyConsumption
-    def setBandwidth(self, bandwidth):
-        self.bandwidth = bandwidth
-    def setStatus(self, status):
-        self.status = status
     def setMode(self, mode):
         self.mode = mode
+        
+    #def evaluateEntity(self, entity):
     
     # Accessors
     def getName(self):
@@ -40,9 +38,5 @@ class Node:
         return self.power
     def getEnergyConsumption(self):
         return self.energyConsumption
-    def getBandwidth(self):
-        return self.bandwidth
-    def getStatus(self):
-        return self.status
     def getMode(self):
         return self.mode
