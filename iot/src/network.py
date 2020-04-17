@@ -1,4 +1,5 @@
 import node
+import entity
 
 class Network:
     # Constructor
@@ -13,6 +14,8 @@ class Network:
         self.connection = connection
     def addNode(self, node):
         self.ban.add(node)
+    def addEntity(self, entity):
+        self.ban.add(entity)
         
     # Accessors
     def getBan(self):
