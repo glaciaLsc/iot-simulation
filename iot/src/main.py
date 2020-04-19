@@ -40,6 +40,7 @@ entity1 = Entity('CISCO Router', nodeNature.SELFISH, 0.9)
 ban = [device1, device2, entity1]
 
 # Construct network
-network = Network(ban, True)
+network = Network(ban)
 
 displayNetwork(network)
+
