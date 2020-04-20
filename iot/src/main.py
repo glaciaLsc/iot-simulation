@@ -10,11 +10,11 @@ from entity import nodeNature
 # Construct IoT devices (name, consumption rate, hasIdentifiables,
 # hasPasswords,hasBiometrics, hasTelemetry, hasMiscellaneous, security mode)
 # As well as unidentified Entities(name, nature, utility)
-device1 = Node('Laptop_1', 1, True, True, False, True, True)
-entity1 = Entity('CISCO Router', nodeNature.MALICIOUS, 0.3)
+device1 = Node('Laptop_1', 2, True, True, False, True, True)
+device2 = Node('MP3_Player_1', 4, False, False, False, True, True)
 
 # Initialize BAN with previously-constructed IoT devices
-ban = [device1]
+ban = [device1, device2]
 
 # Construct network
 network = Network(ban)
@@ -24,4 +24,4 @@ network.display()
 # Run simulation of communication within BAN-- lasts until all known Benevolent
 # nodes are depleted of power.
 #@param: Arbitrary threshold
-network.runLoop(0.2500)
+network.runSimulation(100, 0.5000)
