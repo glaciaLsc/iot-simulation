@@ -15,7 +15,7 @@ device2 = Node('Cell_Phone_1', 3, False, True, True, True, True)
 device3 = Node('MP3_Player_1', 4, False, False, False, True, True)
 device4 = Node('Pager_1', 5, False, False, False, False, False)
 # Open file for writing results
-output = open("results_highbenevolent_highthreshold.txt", "a+")
+output = open("../outputs/results_highbenevolent_highthreshold.txt", "a+")
 
 totalBenefit = 0
 i = 1
