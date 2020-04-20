@@ -6,41 +6,22 @@ from node import nodeMode
 from node import entity
 from entity import Entity
 from entity import nodeNature
-
-def displayNetwork(network):
-    for i in network.ban:
-        if (i.__class__.__name__ == 'Node'):
-            print('Device class:', i.__class__.__name__)
-            print('Device name:', i.getName())
-            print('------------------------')
         
-            print('Power:', i.getPower())
-            print('Energy consumption rate:', i.getEnergyConsumption())
-            print('Energy rating:', i.getEnergyRating())
-            print('Data sensitivity:', i.getDataSensitivity())
-            print('Node security policy:', i.getMode())
-            print()
-        elif (i.__class__.__name__ == 'Entity'):
-            print('Device class:', i.__class__.__name__)
-            print('Device name:', i.getName())
-            print('------------------------')
-            
-            print('Nature:', i.getNature())
-            print('Estimated utility:', i.getUtility())
-        
-        
-# Construct IoT devices (name, power, consumption rate, hasIdentifiables,
+# Construct IoT devices (name, consumption rate, hasIdentifiables,
 # hasPasswords,hasBiometrics, hasTelemetry, hasMiscellaneous, security mode)
 # As well as unidentified Entities(name, nature, utility)
-device1 = Node('Laptop_1', 1.0000, 1, True, True, False, True, True, nodeMode.PASSIVE)
-device2 = Node('Cell_phone_1', .9800, 2, False, True, False, True, False, nodeMode.PASSIVE)
-entity1 = Entity('CISCO Router', nodeNature.SELFISH, 0.9)
+device1 = Node('Laptop_1', 1, True, True, False, True, True)
+entity1 = Entity('CISCO Router', nodeNature.MALICIOUS, 0.3)
 
 # Initialize BAN with previously-constructed IoT devices
-ban = [device1, device2, entity1]
+ban = [device1]
 
 # Construct network
 network = Network(ban)
+# Display network
+network.display()
 
-displayNetwork(network)
-
+# Run simulation of communication within BAN-- lasts until all known Benevolent
+# nodes are depleted of power.
+#@param: Arbitrary threshold
+network.runLoop(0.2500)

@@ -9,15 +9,14 @@ class nodeMode(Enum):
 
 class Node:
     # Constructor
-    def __init__(self, name, power, energyConsumption, hasIdentifiables, 
-                 hasPasswords, hasBiometrics, hasTelemetry, hasMiscellaneous, mode):
+    def __init__(self, name, energyConsumption, hasIdentifiables, 
+                 hasPasswords, hasBiometrics, hasTelemetry, hasMiscellaneous):
         self.name = name
-        self.power = power
+        # Starting power
+        self.power = 100
         self.energyConsumption = energyConsumption
-        
         # Define energy rating by dividing power percentage by consumption per authentication
-        self.energyRating = power / energyConsumption
-        
+        self.energyRating = self.power / energyConsumption
         # Define data sensitivity according to the types of data stored. This allows for the implementation of
         # a weighted security policy, with data-critical devices maintaining relatively aggressive security activity,
         # and less data-sensitive devices prioritizing energy conservation.
@@ -31,9 +30,15 @@ class Node:
         if (hasTelemetry == True):
             self.dataSensitivity += .1000
         if (hasMiscellaneous == True):
-            self.dataSensitivity += .1000
-            
-        self.mode = mode
+            self.dataSensitivity += .1000  
+        # Node mode set to PASSIVE by default
+        self.mode = nodeMode.PASSIVE
+        # Bayesian probabilities
+        self.M = .3333
+        self.S = .3333
+        self.B = .3333
+        # Number of successful communications
+        self.communications = 0
     
     # Methods
     def setName(self, name):
@@ -59,14 +64,16 @@ class Node:
             sensitivity += .1000
             
         self.dataSensitivity = sensitivity
-    # Decide on security policy according to energy & data vulnerability
-    def setMode(self, energyRating, dataSensitivity, threshold):
-        score = energyRating * dataSensitivity
-        
+    def setMode(self, threshold):
+        score = self.energyRating * self.dataSensitivity
+        #print(self.name, 'Threshold:', threshold)
+        #print(self.name, 'Score:', score)
         if (score >= threshold):
             self.mode = nodeMode.SECURE
+            #print(self.name, 'set to SECURE')
         else:
             self.mode = nodeMode.PASSIVE
+            #print(self.name, 'set to PASSIVE')
     
     # Set Markovian probabilities for an opposing Node to be classified as
     # either Malevolent, Selfish, or Benevolent
@@ -79,69 +86,94 @@ class Node:
     # indicates that an entity should be blocked. Conversely, a value of
     # 1 returned represents a permissable entity.
     def evaluateEntity(self, entity):
+        #print('Current Bayesian probability values (M,S,B):', self.M, self.S, self.B)
         # Passive security policy
         if (self.mode == nodeMode.PASSIVE):
             # Malicious + Selfish + Benevolent     
-            allow = ((entity.Entity.getUtility() - self.dataSensitivity - (self.energyRating/100))
-                     + (entity.Entity.getUtility() - (self.energyRating / 100)) 
-                     + (entity.Entity.getUtility()))
+            allow = (self.M*(entity.getUtility() - self.dataSensitivity - (self.energyRating/100))
+                     + self.S*(entity.getUtility() - (self.energyRating / 100)) 
+                     + self.B*(entity.getUtility()))
+            #print('Estimated Allow benefit:', allow)
             block = 0
+            #print('Estimated Blocking benefit:', block)
+            # Subtract power according to consumption rate + policy chosen
+            self.power -= self.energyConsumption / 100.00
             # Compare benefit of blocking to utility of communicating
             if (allow > block):
+                #print('Choosing to forward packets.')
+                # Update total number of successful communications
+                self.communications += 1
                 return True
             else:
+                #print('Choosing to block packets.')
                 return False
         # Active security policy
-        elif (self.mode == nodeMode.ACTIVE):
+        elif (self.mode == nodeMode.SECURE):
             # Evaluation accuracy set at 95%
-            seed = randint % 100 + 1
+            seed = randint(1, 100)
             if (seed < 95):
-                if (entity.Entity.getNature() == nodeNature.MALICIOUS):
-                    self.M = self.approachLimit(self.M, .25, 1.0000)
-                    self.S = self.approachLimit(self.S, -.125, 0.0000)
-                    self.B = self.approachLimit(self.B, -.125, 0.0000)
-                elif (entity.Entity.getNature() == nodeNature.SELFISH):
-                    self.S = self.approachLimit(self.S, .25, 1.0000)
-                    self.M = self.approachLimit(self.M, -.125, 0.0000)
-                    self.B = self.approachLimit(self.B, -.125, 0.0000)
-                elif (entity.Entity.getNature() == nodeNature.BENEVOLENT):
-                    self.B = self.approachLimit(self.B, .25, 1.0000)
-                    self.M = self.approachLimit(self.M, -.125, 0.0000)
-                    self.S = self.approachLimit(self.S, -.125, 0.0000)
+                if (entity.getNature() == nodeNature.MALICIOUS):
+                    self.M = self.approachUpperLimit(self.M, .25, 1.0000)
+                    self.S = self.approachLowerLimit(self.S, -.125, 0.0000)
+                    self.B = self.approachLowerLimit(self.B, -.125, 0.0000)
+                elif (entity.getNature() == nodeNature.SELFISH):
+                    self.S = self.approachUpperLimit(self.S, .1, 1.0000)
+                    self.M = self.approachLowerLimit(self.M, -.05, 0.0000)
+                    self.B = self.approachLowerLimit(self.B, -.05, 0.0000)
+                elif (entity.getNature() == nodeNature.BENEVOLENT):
+                    self.B = self.approachUpperLimit(self.B, .1, 1.0000)
+                    self.M = self.approachLowerLimit(self.M, -.05, 0.0000)
+                    self.S = self.approachLowerLimit(self.S, -.05, 0.0000)
             else:
-                seed = randint % 3
+                seed = randint(0, 2)
                 if (seed == 0):
-                    self.M = self.approachLimit(self.M, .25, 1.0000)
-                    self.S = self.approachLimit(self.S, -.125, 0.0000)
-                    self.B = self.approachLimit(self.B, -.125, 0.0000)
+                    self.M = self.approachUpperLimit(self.M, .25, 1.0000)
+                    self.S = self.approachLowerLimit(self.S, -.125, 0.0000)
+                    self.B = self.approachLowerLimit(self.B, -.125, 0.0000)
                 elif (seed == 1):
-                    self.S = self.approachLimit(self.S, .25, 1.0000)
-                    self.M = self.approachLimit(self.M, -.125, 0.0000)
-                    self.B = self.approachLimit(self.B, -.125, 0.0000)
+                    self.S = self.approachUpperLimit(self.S, .1, 1.0000)
+                    self.M = self.approachLowerLimit(self.M, -.05, 0.0000)
+                    self.B = self.approachLowerLimit(self.B, -.05, 0.0000)
                 elif (seed == 2):
-                    self.B = self.approachLimit(self.B, .25, 1.0000)
-                    self.M = self.approachLimit(self.M, -.125, 0.0000)
-                    self.S = self.approachLimit(self.S, -.125, 0.0000)
-            
-            allow = (self.M*(entity.Entity.getUtility() - self.dataSensitivity - (self.energyRating/100))
-                     + self.S*(entity.Entity.getUtility() - (self.energyRating / 100)) 
-                     + self.B*(entity.Entity.getUtility()))
+                    self.B = self.approachUpperLimit(self.B, .1, 1.0000)
+                    self.M = self.approachLowerLimit(self.M, -.05, 0.0000)
+                    self.S = self.approachLowerLimit(self.S, -.05, 0.0000)
+                    
+            #print('Adjusted Bayesian probability values (M,S,B):', self.M, self.S, self.B)
+            allow = (self.M*(entity.getUtility() - self.dataSensitivity - (self.energyRating/100))
+                     + self.S*(entity.getUtility() - (self.energyRating / 100)) 
+                     + self.B*(entity.getUtility()))
+            #print('Estimated Allow benefit:', allow)
             block = 0
+            #print('Estimated Blocking benefit:', block)
+            # Subtract power according to consumption rate + policy chosen
+            self.power -= (self.energyConsumption*2 / 100.00)
             # Compare benefit of blocking to utility of communicating
             if (allow > block):
+                #print('Choosing to forward packet(s).')
+                # Update total number of successful communications
+                self.communications += 1
                 return True
             else:
+                #print('Choosing to block packet(s).')
                 return False
                     
-    # Mathematical function for operating on integers with limited ranges.
-    # The inclusion of this function is due to the fact that probabilities
+    # Mathematical functions for operating on integers with limited ranges.
+    # The inclusion of these functions is due to the fact that probabilities
     # cannot exceed 1 or descend below 0.
-    def approachLimit(self, n, margin, limit):
+    def approachUpperLimit(self, n, margin, limit):
         n += margin
-        if (n > limit) or (n < limit):
+        if (n > limit):
             return limit
         else:
             return n
+    def approachLowerLimit(self, n, margin, limit):
+        n += margin
+        if (n < limit):
+            return limit
+        else:
+            return n
+        
     # Accessors
     def getName(self):
         return self.name
@@ -155,3 +187,5 @@ class Node:
         return self.dataSensitivity
     def getMode(self):
         return self.mode
+    def getCommunications(self):
+        return self.communications
