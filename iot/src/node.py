@@ -75,7 +75,7 @@ class Node:
             self.mode = nodeMode.PASSIVE
             #print(self.name, 'set to PASSIVE')
     
-    # Set Markovian probabilities for an opposing Node to be classified as
+    # Set Bayesian probabilities for an opposing Node to be classified as
     # either Malevolent, Selfish, or Benevolent
     def setProbabilities(self):
         self.M = .3333
@@ -110,8 +110,8 @@ class Node:
         # Active security policy
         elif (self.mode == nodeMode.SECURE):
             # Evaluation accuracy set at 95%
-            seed = randint(1, 100)
-            if (seed < 95):
+            rchance = random.randint(1, 100)
+            if (rchance < 95):
                 if (entity.getNature() == nodeNature.MALICIOUS):
                     self.M = self.approachUpperLimit(self.M, .25, 1.0000)
                     self.S = self.approachLowerLimit(self.S, -.125, 0.0000)
@@ -125,16 +125,16 @@ class Node:
                     self.M = self.approachLowerLimit(self.M, -.05, 0.0000)
                     self.S = self.approachLowerLimit(self.S, -.05, 0.0000)
             else:
-                seed = randint(0, 2)
-                if (seed == 0):
+                rchance = random.randint(0, 2)
+                if (rchance == 0):
                     self.M = self.approachUpperLimit(self.M, .25, 1.0000)
                     self.S = self.approachLowerLimit(self.S, -.125, 0.0000)
                     self.B = self.approachLowerLimit(self.B, -.125, 0.0000)
-                elif (seed == 1):
+                elif (rchance == 1):
                     self.S = self.approachUpperLimit(self.S, .1, 1.0000)
                     self.M = self.approachLowerLimit(self.M, -.05, 0.0000)
                     self.B = self.approachLowerLimit(self.B, -.05, 0.0000)
-                elif (seed == 2):
+                elif (rchance == 2):
                     self.B = self.approachUpperLimit(self.B, .1, 1.0000)
                     self.M = self.approachLowerLimit(self.M, -.05, 0.0000)
                     self.S = self.approachLowerLimit(self.S, -.05, 0.0000)

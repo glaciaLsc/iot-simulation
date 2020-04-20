@@ -24,6 +24,7 @@ class Network:
         for i in ban:
             if (i.__class__.__name__ == 'Node'):
                 self.numberOfKnownNodes += 1
+        self.overallBenefit = 0
     def addNode(self, node):
         self.ban.append(node)
     def addEntity(self, entity):
@@ -52,20 +53,18 @@ class Network:
                 
     def runSimulation(self, numRandomEntities, threshold):
         while (self.numberOfKnownNodes > 0):
-            #### Create random unknown entities
-            n = 0
-            while (n < numRandomEntities):
-                rnature = randint(0, 2)
-                rutility = randint(0, 10)
-                if (rnature == 0):
-                    e = Entity('e', nodeNature.MALICIOUS, rutility)
-                elif (rnature == 1):
-                    e = Entity('e', nodeNature.SELFISH, rutility)
-                elif (rnature == 2):
+            # Create random unknown entities
+            for i in range(numRandomEntities):
+                rnature = random.randint(1, 99)
+                rutility = random.randint(0, 10)
+                if (rnature <= 75):
                     e = Entity('e', nodeNature.BENEVOLENT, rutility)
+                elif (rnature > 75 <= 87):
+                    e = Entity('e', nodeNature.MALICIOUS, rutility)
+                elif (rnature > 87 <= 99):
+                    e = Entity('e', nodeNature.SELFISH, rutility)
                 self.addEntity(e)
-                n += 1
-            ####
+            
             # Loop through network & simulate interactions
             for i in self.ban:
                 if  (i.__class__.__name__ == 'Node'):
@@ -88,8 +87,12 @@ class Network:
                     self.numberOfKnownNodes -= 1
                     self.ban.remove(i)
                 
-        print('Total achieved network utility:', self.overallBenefit)
+        #print('Total achieved network utility:', self.overallBenefit)
                                 
     # Accessors
     def getBan(self):
         return self.ban
+    def getNumberOfKnownNodes(self):
+        return self.numberOfKnownNodes
+    def getOverallBenefit(self):
+        return self.overallBenefit
