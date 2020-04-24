@@ -18,8 +18,7 @@ device4 = Node('Pager_1', 5, False, False, False, False, False)
 output = open("../outputs/results_highbenevolent_highthreshold.txt", "a+")
 
 totalBenefit = 0
-i = 1
-while (i <= 10000):
+for i in range(10000):
     # Initialize BAN with previously-constructed IoT devices
     ban = [device1, device2, device3, device4]
     # Construct network
@@ -35,7 +34,6 @@ while (i <= 10000):
     totalBenefit += network.getOverallBenefit()
     # Append results to file
     output.write(str(network.getOverallBenefit()) + '\n')
-    i += 1
 
 # Append final average to file    
 output.write('\n' + "Average benefit: " + str(totalBenefit / i))
